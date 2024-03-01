@@ -1,16 +1,17 @@
+import multiprocessing
 import os
 import psutil
 import cpuinfo
 import GPUtil
 import time
 import pywifi
-import numpy
 from prettytable import PrettyTable
 import argparse
 
 from colorama import Fore, init
 
 init()
+table = PrettyTable()
 
 def get_system_info():
     """
@@ -139,7 +140,7 @@ def LinePrintInto():
 def TablePrintInfo():
     System_info = get_system_info()
     os.system("cls")
-    table = PrettyTable()
+    table.clear()
     table.add_row(
         [
             "CPU",
@@ -180,6 +181,7 @@ def TablePrintInfo():
     print(table)
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     parser = argparse.ArgumentParser(description="OpenMonitor")
     parser.add_argument("-t", "--TablePrintInfo", action="store_true", help="Show info in table")
     args = parser.parse_args()

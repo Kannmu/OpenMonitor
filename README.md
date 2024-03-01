@@ -1,6 +1,9 @@
 # OpenMonitor
 
-OpenMonitor is a Python script that provides real-time system information such as CPU usage, CPU temperature, CPU model, RAM usage, total RAM, GPU usage, GPU memory usage, total GPU memory, system power consumption, and WiFi network information. The script uses various libraries such as `os`, `psutil`, `cpuinfo`, `GPUtil`, `time`, `pywifi`, `numpy`, `prettytable`, and `argparse` to gather and display the system information.
+![LineMode](https://github.com/Kannmu/OpenMonitor/assets/53987473/5aac234f-d9aa-4e97-808a-b38e37356c76)
+![TableMode](https://github.com/Kannmu/OpenMonitor/assets/53987473/a94d2755-de33-4256-ad2c-10025fc90882)
+
+OpenMonitor is a command line tool developed with Python that provides real-time system information such as CPU usage, CPU temperature, CPU model, RAM usage, total RAM, GPU usage, GPU memory usage, total GPU memory, system power consumption, and WiFi network information. The script uses various libraries such as `os`, `psutil`, `cpuinfo`, `GPUtil`, `time`, `pywifi`, `numpy`, `prettytable`, and `argparse` to gather and display the system information.
 
 ## System Information
 
@@ -17,10 +20,12 @@ The script retrieves the following system information:
 
 ## Usage
 
+Simply run OpenMonitor.exe or run through py script.
+
 To run the script, use the following command:
 
 ```
-python openmonitor.py [-t]
+python OpenMonitor.py [-t]
 ```
 
 The script accepts an optional argument `-t` or `--TablePrintInfo` to display the system information in a table format.
