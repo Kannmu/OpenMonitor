@@ -20,71 +20,71 @@ def get_system_info():
     and WiFi network information.
 
     Returns:
-        A dictionary containing the following system information:
-        - 'cpu_usage': Current CPU usage as a percentage.
-        - 'cpu_model': CPU model name.
-        - 'ram_usage': Current RAM usage as a percentage.
-        - 'total_ram': Total RAM of the system in gigabytes.
-        - 'gpu_usage': Current GPU usage as a percentage.
-        - 'gpu_memory_usage': Current GPU memory usage as a percentage.
-        - 'total_gpu_memory': Total GPU memory in bytes.
-        - 'ssid': SSID of the currently connected WiFi network.
-        - 'signal_strength': Signal strength of the currently connected WiFi network.
-        - 'signal_strength_Percent': Signal strength of the currently connected WiFi network as a percentage.
-        - 'protocol': Authentication protocol of the currently connected WiFi network.
+        A dictionary containing the system information.
     """
-    # Get CPU usage as a percentage
-    cpu_usage = psutil.cpu_percent()
-    cpu_freq = psutil.cpu_freq().current / 1000
+    system_info = {}
 
-    # Get CPU model name
-    cpu_model = cpuinfo.get_cpu_info()["brand_raw"]
+    try:
+        # Get CPU usage as a percentage
+        system_info["cpu_usage"] = psutil.cpu_percent()
+        system_info["cpu_freq"] = psutil.cpu_freq().current / 1000
 
-    # Get RAM usage as a percentage
-    ram_usage = psutil.virtual_memory().percent
+        # Get CPU model name
+        system_info["cpu_model"] = cpuinfo.get_cpu_info()["brand_raw"]
 
-    # Get total RAM of the system in gigabytes
-    total_ram = psutil.virtual_memory().total / (1024**3)
+        # Get RAM usage as a percentage
+        system_info["ram_usage"] = psutil.virtual_memory().percent
 
-    # Get GPU usage as a percentage
-    gpus = GPUtil.getGPUs()
-    gpu_usage = gpus[0].load * 100
+        # Get total RAM of the system in gigabytes
+        system_info["total_ram"] = psutil.virtual_memory().total / (1024**3)
 
-    # Get GPU memory usage as a percentage
-    gpu_memory_usage = gpus[0].memoryUtil * 100
+        # Get GPU usage as a percentage
+        gpus = GPUtil.getGPUs()
+        system_info["gpu_usage"] = gpus[0].load * 100
 
-    # Get total GPU memory in bytes
-    total_gpu_memory = gpus[0].memoryTotal
+        # Get GPU memory usage as a percentage
+        system_info["gpu_memory_usage"] = gpus[0].memoryUtil * 100
 
-    # Extract the required information from the WiFi information
-    wifi = pywifi.PyWiFi()
+        # Get total GPU memory in bytes
+        system_info["total_gpu_memory"] = gpus[0].memoryTotal
 
-    ifaces = wifi.interfaces()[0]
-    if ifaces.status() == pywifi.const.IFACE_CONNECTED:
-        # Get the current connected WiFi network
-        current_network = ifaces.scan_results()[0]
+    except Exception as e:
+        # Handle exceptions and assign default values
+        system_info["cpu_usage"] = 0
+        system_info["cpu_freq"] = 0
+        system_info["cpu_model"] = "N/A"
+        system_info["ram_usage"] = 0
+        system_info["total_ram"] = 0
+        system_info["gpu_usage"] = 0
+        system_info["gpu_memory_usage"] = 0
+        system_info["total_gpu_memory"] = 0
 
-        # Extract the required information from the WiFi network
-        ssid = current_network.ssid
-        signal_strength = current_network.signal
-        signal_strength_Percent = 2 * (signal_strength + 100)
-        protocol = current_network.auth
+    try:
+        # Extract the required information from the WiFi information
+        wifi = pywifi.PyWiFi()
 
-    # Create a dictionary to store the system information
-    system_info = {
-        "cpu_usage": cpu_usage,
-        "cpu_freq": cpu_freq,
-        "cpu_model": cpu_model,
-        "ram_usage": ram_usage,
-        "total_ram": total_ram,
-        "gpu_usage": gpu_usage,
-        "gpu_memory_usage": gpu_memory_usage,
-        "total_gpu_memory": total_gpu_memory,
-        "ssid": ssid,
-        "signal_strength": signal_strength,
-        "signal_strength_Percent": signal_strength_Percent,
-        "protocol": protocol,
-    }
+        ifaces = wifi.interfaces()[0]
+        if ifaces.status() == pywifi.const.IFACE_CONNECTED:
+            # Get the current connected WiFi network
+            current_network = ifaces.scan_results()[0]
+
+            # Extract the required information from the WiFi network
+            system_info["ssid"] = current_network.ssid
+            system_info["signal_strength"] = current_network.signal
+            system_info["signal_strength_Percent"] = 2 * (current_network.signal + 100)
+            system_info["protocol"] = current_network.auth
+        else:
+            system_info["ssid"] = "N/A"
+            system_info["signal_strength"] = 0
+            system_info["signal_strength_Percent"] = 0
+            system_info["protocol"] = "N/A"
+
+    except Exception as e:
+        # Handle exceptions and assign default values
+        system_info["ssid"] = "N/A"
+        system_info["signal_strength"] = 0
+        system_info["signal_strength_Percent"] = 0
+        system_info["protocol"] = "N/A"
 
     # Return the system information
     return system_info
