@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import sys
 import psutil
 import cpuinfo
 import GPUtil
@@ -7,11 +8,54 @@ import time
 import pywifi
 from prettytable import PrettyTable
 import argparse
-
+import subprocess
+import json
 from colorama import Fore, init
 
 init()
 table = PrettyTable()
+
+Bluetooth_BAT_Obtain_Gap = 60 # Time gap in second of func, default to 60
+
+def get_bluetooth_bat():
+    # PowerShell command to retrieve Bluetooth device information
+    powershell_command = r"""
+    $devices = Get-PnpDevice | Where-Object {($_.Class -EQ 'Bluetooth' -and $_.InstanceId -Like 'BTHLE\*') -or ($_.Class -EQ 'System' -and $_.InstanceId -Like 'BTHENUM\*')}
+    $res = $devices | Get-PnpDeviceProperty -KeyName '{104EA319-6EE2-4701-BD47-8DDBF425BBE5} 2' | Where-Object Type -ne Empty
+    $hash = @{FriendlyName = @(); InstanceId = @(); Battery = @()}
+    $res | ForEach-Object {
+        $hash["FriendlyName"] += ($devices | Where-Object InstanceId -EQ $_.InstanceId).FriendlyName;
+        $hash["InstanceId"] += $_.InstanceId;
+        $hash["Battery"] += $_.Data;
+    }
+    $hash | ConvertTo-Json
+    """
+
+    # Execute the PowerShell command and capture the output
+    result = subprocess.run(
+        ["powershell", "-Command", powershell_command], capture_output=True, text=True
+    )
+    os.system("cls")  # Clear the console screen
+
+    output = result.stdout.strip()
+
+    # Parse the output as JSON
+    output = json.loads(output)
+
+    # Delete the "InstanceId" key from the output dictionary
+    del output["InstanceId"]
+
+    n = len(list(output.values())[0])
+
+    result = [[0] * n for _ in range(2)]
+
+    for i, values in enumerate(output.values()):
+        result[i] = values
+
+    result = sort_matrix_by_row(result, 0)
+
+    return result
+
 
 def get_system_info():
     """
@@ -90,9 +134,16 @@ def get_system_info():
     return system_info
 
 
+def sort_matrix_by_row(matrix, row_index):
+    matrix[row_index] = [float(i) for i in matrix[row_index]]
+    sorted_data = [
+        list(x)
+        for x in zip(*sorted(zip(*matrix), key=lambda x: x[row_index], reverse=True))
+    ]
+    return sorted_data
+
+
 def LinePrintInto():
-    System_info = get_system_info()
-    os.system("cls")
     print(
         Fore.RED + "CPU: ",
         str(System_info["cpu_usage"]),
@@ -136,10 +187,15 @@ def LinePrintInto():
         "%",
     )
 
+    # Bluetooth
+    print(
+        Fore.CYAN + "Bluetooth Battery: ",
+    )
+    for i, bluetooth_device in enumerate(Bluetooth_BAT_Info[1]):
+        print("\t",bluetooth_device, ":", Bluetooth_BAT_Info[0][i],"%")
+
 
 def TablePrintInfo():
-    System_info = get_system_info()
-    os.system("cls")
     table.clear()
     table.add_row(
         [
@@ -172,22 +228,44 @@ def TablePrintInfo():
         ]
     )
     table.add_row(
-        [
-            "WI-FI", 
-            str(System_info["ssid"]), 
-            str(System_info["signal_strength"]) + "dBm"
-        ]
+        ["WI-FI", str(System_info["ssid"]), str(System_info["signal_strength"]) + "dBm"]
     )
+    for i, bluetooth_device in enumerate(Bluetooth_BAT_Info[1]):
+        table.add_row(
+            ["Bluetooth Battery", bluetooth_device, str(Bluetooth_BAT_Info[0][i]) + "%"]
+        )
+        # print("\t",bluetooth_device, ":", Bluetooth_BAT_Info[0][i],"%")
     print(table)
 
+
 if __name__ == "__main__":
+    TimeCount = 0
+    # Disable multiprocessing
     multiprocessing.freeze_support()
+    
+    # Parameter Decompose
     parser = argparse.ArgumentParser(description="OpenMonitor")
-    parser.add_argument("-t", "--TablePrintInfo", action="store_true", help="Show info in table")
+    parser.add_argument(
+        "-t", "--TablePrintInfo", action="store_true", help="Show info in table"
+    )
+
     args = parser.parse_args()
+
+    # Start Loop
     while True:
+        # Get System Data
+        System_info = get_system_info()
+
+        if TimeCount >= 60 or TimeCount == 0:
+            TimeCount = 0
+            Bluetooth_BAT_Info = get_bluetooth_bat()
+
+        os.system("cls")
         if args.TablePrintInfo:
             TablePrintInfo()
         else:
             LinePrintInto()
-        time.sleep(1)
+        
+        # Break
+        time.sleep(2)
+        TimeCount += 1
