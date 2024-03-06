@@ -1,18 +1,22 @@
 # OpenMonitor
 
 <center>
+LineMode
+</center>
 
 ![LineMode](https://github.com/Kannmu/OpenMonitor/blob/main/Img/LineMode.png)
 
-LineMode
+<center>
+TableMode
+</center>
 
 ![TableMode](https://github.com/Kannmu/OpenMonitor/blob/main/Img/TableMode.png)
 
-TableMode
-
 </center>
 
-OpenMonitor is a command line tool developed with Python that provides real-time system information and other information.
+OpenMonitor is a open source command line tool developed with Python that provides real-time system information and other information.
+
+OM (OpenMonitor) is also an acronym for Open Monitor Meditation, which encompasses the philosophy of this project.
 
 ## Supported Information
 
