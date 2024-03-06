@@ -1,4 +1,5 @@
 import math
+import multiprocessing
 import os
 import psutil
 import cpuinfo
@@ -7,6 +8,7 @@ import pywifi
 import subprocess
 import json
 import Utilities as u
+multiprocessing.freeze_support()
 
 def get_bluetooth_bat():
     # PowerShell command to retrieve Bluetooth device information

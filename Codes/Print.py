@@ -1,7 +1,10 @@
+import multiprocessing
+import os
 from colorama import Fore,Back,Style,  init
 import datetime
 
 init()
+multiprocessing.freeze_support()
 
 def DecodeInfo(Info):
     global System_Info,Wifi_Info,Bluetooth_BAT_Info
@@ -12,6 +15,8 @@ def DecodeInfo(Info):
 def LinePrintInto(Info):
     DecodeInfo(Info)
     Now = datetime.datetime.now()
+    os.system("cls")
+
     print(Fore.WHITE + "OpenMonitor", Now.date(),Now.strftime("%A"),Now.strftime("%H:%M"))
 
     print(
@@ -69,10 +74,9 @@ def LinePrintInto(Info):
             print(Fore.CYAN +"\t",bluetooth_device, ":",BAT,"%")
 
 def TablePrintInfo(Info, table):
-    
     DecodeInfo(Info)
-
     Now = datetime.datetime.now()
+    os.system("cls")
     print(Fore.WHITE + "OpenMonitor", Now.date(),Now.strftime("%A"),Now.strftime("%H:%M"))
     
     table.clear()

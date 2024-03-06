@@ -48,7 +48,6 @@ if __name__ == "__main__":
             Bluetooth_BAT_Info
         ]
 
-        os.system("cls")
         if args.TablePrintInfo:
             p.TablePrintInfo(Info, table)
         else:
