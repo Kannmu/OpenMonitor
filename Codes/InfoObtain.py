@@ -10,6 +10,9 @@ import json
 import Utilities as u
 multiprocessing.freeze_support()
 
+wifi = pywifi.PyWiFi()
+ifaces = wifi.interfaces()[0]
+
 def get_bluetooth_bat():
     # PowerShell command to retrieve Bluetooth device information
     powershell_command = r"""
@@ -59,9 +62,6 @@ def get_wifi_info():
     wifi_info = {}
 
     try:
-        wifi = pywifi.PyWiFi()
-        ifaces = wifi.interfaces()[0]
-
         if ifaces.status() == pywifi.const.IFACE_CONNECTED:
             current_network = ifaces.scan_results()[0]
             wifi_info["ssid"] = current_network.ssid
